@@ -1,0 +1,794 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>七下第三次段考生物複習</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --panel: #ffffff;
+      --text: #172033;
+      --muted: #667085;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --success: #15803d;
+      --error: #b91c1c;
+      --border: #d9e1ee;
+      --shadow: 0 18px 45px rgba(23, 32, 51, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(37, 99, 235, 0.12), transparent 34rem),
+        var(--bg);
+    }
+
+    main {
+      width: min(760px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 42px 0;
+    }
+
+    .header {
+      margin-bottom: 22px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      line-height: 1.1;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 1.05rem;
+    }
+
+    .quiz-card {
+      padding: 24px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .start-screen {
+      display: grid;
+      gap: 18px;
+    }
+
+    .start-screen.hidden,
+    .quiz-screen.hidden {
+      display: none;
+    }
+
+    .start-title {
+      margin: 0;
+      font-size: clamp(1.55rem, 4vw, 2.2rem);
+      line-height: 1.2;
+    }
+
+    .start-note {
+      margin: 0;
+      color: var(--muted);
+      font-weight: 700;
+      line-height: 1.55;
+    }
+
+    .count-options {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .topic-options {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .option-label {
+      margin: 0;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .count-option {
+      min-height: 58px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      color: var(--text);
+      background: #ffffff;
+      font-size: 1.08rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+    }
+
+    .topic-option {
+      min-height: 58px;
+    }
+
+    .count-option:hover,
+    .count-option:focus-visible {
+      border-color: var(--primary);
+      background: #eef5ff;
+      outline: none;
+      transform: translateY(-1px);
+    }
+
+    .count-option.selected,
+    .topic-option.selected {
+      border-color: var(--primary);
+      color: #ffffff;
+      background: var(--primary);
+    }
+
+    .start-message {
+      min-height: 24px;
+      color: var(--error);
+      font-weight: 700;
+    }
+
+    .top-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .progress {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .number {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      color: #ffffff;
+      background: var(--primary);
+      font-weight: 700;
+    }
+
+    .question-text {
+      margin: 0 0 22px;
+      font-size: clamp(1.65rem, 6vw, 2.75rem);
+      line-height: 1.15;
+    }
+
+    .choices {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .choice {
+      min-height: 58px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      color: var(--text);
+      background: #ffffff;
+      font-size: 1.12rem;
+      font-weight: 700;
+      text-align: left;
+      cursor: pointer;
+      transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+    }
+
+    .choice:hover:not(:disabled),
+    .choice:focus-visible {
+      border-color: var(--primary);
+      background: #eef5ff;
+      outline: none;
+      transform: translateY(-1px);
+    }
+
+    .choice:disabled {
+      cursor: default;
+      opacity: 0.8;
+    }
+
+    .choice.correct {
+      border-color: rgba(21, 128, 61, 0.55);
+      color: var(--success);
+      background: #f0fdf4;
+    }
+
+    .choice.wrong {
+      border-color: rgba(185, 28, 28, 0.45);
+      color: var(--error);
+      background: #fff5f5;
+    }
+
+    .feedback {
+      min-height: 26px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .feedback .explanation {
+      display: block;
+      margin-top: 8px;
+      color: var(--muted);
+      font-weight: 600;
+      line-height: 1.55;
+    }
+
+    .feedback.correct {
+      color: var(--success);
+    }
+
+    .feedback.wrong {
+      color: var(--error);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    button {
+      min-height: 44px;
+      border: 0;
+      border-radius: 8px;
+      padding: 0 18px;
+      color: #ffffff;
+      background: var(--primary);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:hover:not(:disabled) {
+      background: var(--primary-dark);
+    }
+
+    button:disabled {
+      cursor: default;
+      opacity: 0.55;
+    }
+
+    button.secondary {
+      color: var(--primary);
+      background: #eaf1ff;
+    }
+
+    button.secondary:hover {
+      background: #dbe8ff;
+    }
+
+    .result {
+      display: none;
+      margin-top: 20px;
+      padding: 18px;
+      border: 1px solid rgba(37, 99, 235, 0.22);
+      border-radius: 8px;
+      background: #eef5ff;
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .result.show {
+      display: block;
+    }
+
+    .review {
+      display: none;
+      margin-top: 18px;
+    }
+
+    .review.show {
+      display: block;
+    }
+
+    .review-section {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      background: #ffffff;
+    }
+
+    .review-section h3 {
+      margin: 0 0 12px;
+      font-size: 1.1rem;
+    }
+
+    .review-list {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .review-item {
+      border-radius: 8px;
+      padding: 12px;
+      background: #f8fafc;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .review-item strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--text);
+      font-size: 1.05rem;
+    }
+
+    .review-item.correct {
+      background: #f0fdf4;
+      color: var(--success);
+    }
+
+    .review-item.wrong {
+      background: #fff5f5;
+      color: var(--error);
+    }
+
+    .review-detail,
+    .review-explanation {
+      display: block;
+      line-height: 1.55;
+    }
+
+    .review-options {
+      display: grid;
+      gap: 6px;
+      margin: 10px 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .review-option {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 9px 10px;
+      background: #ffffff;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .review-option.selected {
+      border-color: rgba(185, 28, 28, 0.45);
+      color: var(--error);
+      background: #fff5f5;
+    }
+
+    .review-option.correct {
+      border-color: rgba(21, 128, 61, 0.55);
+      color: var(--success);
+      background: #f0fdf4;
+    }
+
+    .review-explanation {
+      margin-top: 6px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .empty-note {
+      margin: 0;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    @media (max-width: 620px) {
+      main {
+        width: min(100% - 24px, 760px);
+        padding: 28px 0;
+      }
+
+      .quiz-card {
+        padding: 18px;
+      }
+
+      .choices {
+        grid-template-columns: 1fr;
+      }
+
+      .count-options {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .topic-options {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="header" aria-labelledby="title">
+      <h1 id="title">七下第三次段考生物複習</h1>
+      <p class="subtitle">一次顯示一題，選出正確答案後再進入下一題，完成後可查看錯題集。</p>
+    </section>
+
+    <section class="quiz-card" aria-live="polite">
+      <div class="start-screen" id="startScreen">
+        <h2 class="start-title">選擇本次作答的範圍及題數</h2>
+        <p class="start-note">系統會從完整題庫中隨機抽題，並隨機安排作答順序。</p>
+        <p class="option-label">選擇範圍，可複選</p>
+        <div class="topic-options" id="topicOptions">
+          <button class="count-option topic-option" type="button" data-topic="植物界">植物界</button>
+          <button class="count-option topic-option" type="button" data-topic="動物界">動物界</button>
+          <button class="count-option topic-option" type="button" data-topic="生態系">生態系</button>
+          <button class="count-option topic-option" type="button" data-topic="人類與環境">人類與環境</button>
+        </div>
+        <p class="option-label">選擇題數</p>
+        <div class="count-options" id="countOptions">
+          <button class="count-option" type="button" data-count="5">5 題</button>
+          <button class="count-option" type="button" data-count="10">10 題</button>
+          <button class="count-option" type="button" data-count="20">20 題</button>
+          <button class="count-option" type="button" data-count="25">25 題</button>
+          <button class="count-option" type="button" data-count="50">50 題</button>
+          <button class="count-option" type="button" data-count="100">100 題</button>
+        </div>
+        <div class="start-message" id="startMessage" aria-live="polite"></div>
+      </div>
+
+      <div class="quiz-screen hidden" id="quizScreen">
+        <div class="top-row">
+          <div class="progress">
+            <span class="number" id="questionNumber">1</span>
+            <span id="progressText">第 1 / 4 題</span>
+          </div>
+          <span id="scoreText">目前得分：0 / 100</span>
+        </div>
+
+        <h2 class="question-text" id="questionText"></h2>
+        <div class="choices" id="choices"></div>
+        <div class="feedback" id="feedback">請選擇一個答案。</div>
+
+        <div class="actions">
+          <button type="button" id="nextButton" disabled>下一題</button>
+          <button class="secondary" type="button" id="finishButton">提前結束</button>
+          <button class="secondary" type="button" id="restartButton">重新選擇題數</button>
+        </div>
+
+        <div class="result" id="result"></div>
+        <div class="review" id="review">
+          <section class="review-section" aria-labelledby="wrongTitle">
+            <h3 id="wrongTitle">錯題集</h3>
+            <ul class="review-list" id="wrongList"></ul>
+          </section>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="biology-plant-questions.js"></script>
+  <script src="biology-review-questions.js"></script>
+  <script>
+    const questionBank = window.quizQuestions || [];
+    let questions = [];
+
+    const startScreen = document.querySelector("#startScreen");
+    const quizScreen = document.querySelector("#quizScreen");
+    const topicOptions = document.querySelector("#topicOptions");
+    const countOptions = document.querySelector("#countOptions");
+    const startMessage = document.querySelector("#startMessage");
+    const questionNumber = document.querySelector("#questionNumber");
+    const progressText = document.querySelector("#progressText");
+    const scoreText = document.querySelector("#scoreText");
+    const questionText = document.querySelector("#questionText");
+    const choices = document.querySelector("#choices");
+    const feedback = document.querySelector("#feedback");
+    const nextButton = document.querySelector("#nextButton");
+    const finishButton = document.querySelector("#finishButton");
+    const restartButton = document.querySelector("#restartButton");
+    const result = document.querySelector("#result");
+    const review = document.querySelector("#review");
+    const wrongList = document.querySelector("#wrongList");
+
+    let currentIndex = 0;
+    let score = 0;
+    let hasAnswered = false;
+    let answers = [];
+
+    function shuffle(items) {
+      const shuffled = [...items];
+
+      for (let index = shuffled.length - 1; index > 0; index -= 1) {
+        const randomIndex = Math.floor(Math.random() * (index + 1));
+        [shuffled[index], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[index]];
+      }
+
+      return shuffled;
+    }
+
+    function randomizeChoices(question) {
+      const labels = ["A", "B", "C", "D"];
+      let shuffledChoices = shuffle(question.choices);
+      const keptOriginalOrder = shuffledChoices.every((choice, index) => choice.key === question.choices[index].key);
+
+      if (keptOriginalOrder && shuffledChoices.length > 1) {
+        shuffledChoices = [...shuffledChoices.slice(1), shuffledChoices[0]];
+      }
+
+      const choices = shuffledChoices.map((choice, index) => ({
+        key: labels[index],
+        text: choice.text,
+        originalKey: choice.key
+      }));
+      const correctChoice = choices.find((choice) => choice.originalKey === question.answer);
+
+      return {
+        ...question,
+        choices,
+        answer: correctChoice ? correctChoice.key : question.answer
+      };
+    }
+
+    function startQuiz(count) {
+      const selectedTopics = Array.from(document.querySelectorAll("[data-topic].selected"))
+        .map((button) => button.dataset.topic);
+      const availableQuestions = questionBank.filter((question) => selectedTopics.includes(question.category));
+
+      if (selectedTopics.length === 0) {
+        startMessage.textContent = "請至少選擇一個範圍。";
+        return;
+      }
+
+      if (availableQuestions.length === 0) {
+        startMessage.textContent = "目前選取範圍內尚無題目。";
+        return;
+      }
+
+      startMessage.textContent = "";
+      questions = shuffle(availableQuestions)
+        .slice(0, Math.min(count, availableQuestions.length))
+        .map(randomizeChoices);
+      currentIndex = 0;
+      score = 0;
+      answers = [];
+
+      startScreen.classList.add("hidden");
+      quizScreen.classList.remove("hidden");
+      renderQuestion();
+    }
+
+    function formatScore(correctCount) {
+      if (questions.length === 0) {
+        return "0";
+      }
+
+      const scoreValue = correctCount * (100 / questions.length);
+      return Number.isInteger(scoreValue) ? String(scoreValue) : scoreValue.toFixed(1);
+    }
+
+    function renderQuestion() {
+      const current = questions[currentIndex];
+
+      if (!current) {
+        questionNumber.textContent = "0";
+        progressText.textContent = "沒有可用題目";
+        scoreText.textContent = "目前得分：0 / 100";
+        questionText.textContent = "找不到題庫";
+        choices.innerHTML = "";
+        feedback.textContent = "請確認 questions.js 已正確載入。";
+        nextButton.disabled = true;
+        return;
+      }
+
+      hasAnswered = false;
+      questionNumber.textContent = currentIndex + 1;
+      progressText.textContent = `第 ${currentIndex + 1} / ${questions.length} 題`;
+      scoreText.textContent = `目前得分：${formatScore(score)} / 100`;
+      questionText.textContent = current.text;
+      feedback.textContent = "請選擇一個答案。";
+      feedback.className = "feedback";
+      nextButton.disabled = true;
+      finishButton.disabled = false;
+      nextButton.textContent = currentIndex === questions.length - 1 ? "看結果" : "下一題";
+      result.classList.remove("show");
+      result.textContent = "";
+      review.classList.remove("show");
+
+      choices.innerHTML = "";
+      current.choices.forEach((choice) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "choice";
+        button.dataset.key = choice.key;
+        button.textContent = `${choice.key}. ${choice.text}`;
+        button.addEventListener("click", () => checkAnswer(button, choice.key));
+        choices.appendChild(button);
+      });
+    }
+
+    function checkAnswer(selectedButton, selectedKey) {
+      if (hasAnswered) {
+        return;
+      }
+
+      const current = questions[currentIndex];
+      const choiceButtons = Array.from(document.querySelectorAll(".choice"));
+
+      hasAnswered = true;
+      choiceButtons.forEach((button) => {
+        button.disabled = true;
+
+        if (button.dataset.key === current.answer) {
+          button.classList.add("correct");
+        }
+      });
+
+      if (selectedKey === current.answer) {
+        score += 1;
+        feedback.innerHTML = "";
+        feedback.append("答對了！");
+        feedback.classList.add("correct");
+      } else {
+        selectedButton.classList.add("wrong");
+        feedback.innerHTML = "";
+        feedback.append(`答錯了，正確答案是 ${current.answer}。`);
+        feedback.classList.add("wrong");
+      }
+
+      if (current.explanation) {
+        const explanation = document.createElement("span");
+        explanation.className = "explanation";
+        explanation.textContent = `詳解：${current.explanation}`;
+        feedback.appendChild(explanation);
+      }
+
+      answers[currentIndex] = {
+        question: current.text,
+        choices: current.choices,
+        selectedAnswer: selectedKey,
+        selectedText: (current.choices.find((choice) => choice.key === selectedKey) || {}).text || "",
+        correctAnswer: current.answer,
+        correctText: (current.choices.find((choice) => choice.key === current.answer) || {}).text || "",
+        explanation: current.explanation,
+        isCorrect: selectedKey === current.answer
+      };
+
+      scoreText.textContent = `目前得分：${formatScore(score)} / 100`;
+      nextButton.disabled = false;
+      nextButton.focus();
+    }
+
+    function createReviewItem(answer) {
+      const item = document.createElement("li");
+      item.className = `review-item ${answer.isCorrect ? "correct" : "wrong"}`;
+
+      const title = document.createElement("strong");
+      title.textContent = answer.question;
+
+      const optionList = document.createElement("ul");
+      optionList.className = "review-options";
+
+      answer.choices.forEach((choice) => {
+        const optionItem = document.createElement("li");
+        optionItem.className = "review-option";
+        optionItem.textContent = `${choice.key}. ${choice.text}`;
+
+        if (choice.key === answer.selectedAnswer) {
+          optionItem.classList.add("selected");
+          optionItem.textContent += "（你的答案）";
+        }
+
+        if (choice.key === answer.correctAnswer) {
+          optionItem.classList.add("correct");
+          optionItem.textContent += "（正確答案）";
+        }
+
+        optionList.appendChild(optionItem);
+      });
+
+      item.append(title, optionList);
+
+      if (answer.explanation) {
+        const explanation = document.createElement("span");
+        explanation.className = "review-explanation";
+        explanation.textContent = `詳解：${answer.explanation}`;
+        item.appendChild(explanation);
+      }
+
+      return item;
+    }
+
+    function showResult() {
+      const wrongAnswers = answers.filter((answer) => !answer.isCorrect);
+
+      questionText.textContent = "練習完成";
+      choices.innerHTML = "";
+      feedback.textContent = "你已完成所有題目。";
+      feedback.className = "feedback";
+      nextButton.disabled = true;
+      finishButton.disabled = true;
+      result.textContent = `總分：${formatScore(score)} / 100（答對 ${score} / ${answers.length} 題）`;
+      result.classList.add("show");
+
+      wrongList.innerHTML = "";
+
+      if (wrongAnswers.length === 0) {
+        wrongList.innerHTML = '<li class="empty-note">太棒了，這次沒有錯題。</li>';
+      } else {
+        wrongAnswers.forEach((answer) => wrongList.appendChild(createReviewItem(answer)));
+      }
+
+      review.classList.add("show");
+    }
+
+    nextButton.addEventListener("click", () => {
+      if (currentIndex < questions.length - 1) {
+        currentIndex += 1;
+        renderQuestion();
+      } else {
+        showResult();
+      }
+    });
+
+    restartButton.addEventListener("click", () => {
+      currentIndex = 0;
+      score = 0;
+      answers = [];
+      questions = [];
+      choices.innerHTML = "";
+      result.classList.remove("show");
+      review.classList.remove("show");
+      finishButton.disabled = false;
+      startMessage.textContent = "";
+      quizScreen.classList.add("hidden");
+      startScreen.classList.remove("hidden");
+    });
+
+    topicOptions.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-topic]");
+
+      if (!button) {
+        return;
+      }
+
+      button.classList.toggle("selected");
+      startMessage.textContent = "";
+    });
+
+    finishButton.addEventListener("click", () => {
+      if (answers.length === 0) {
+        feedback.textContent = "請至少完成一題後再提前結束。";
+        feedback.className = "feedback wrong";
+        return;
+      }
+
+      showResult();
+    });
+
+    countOptions.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-count]");
+
+      if (!button) {
+        return;
+      }
+
+      startQuiz(Number(button.dataset.count));
+    });
+  </script>
+</body>
+</html>
