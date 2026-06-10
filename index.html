@@ -54,6 +54,26 @@
       font-size: 1.05rem;
     }
 
+    .creator {
+      margin-top: 24px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .creator a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .creator a:hover,
+    .creator a:focus-visible {
+      color: var(--primary-dark);
+      text-decoration: underline;
+      outline: none;
+    }
+
     .quiz-card {
       padding: 24px;
       border: 1px solid var(--border);
@@ -479,6 +499,11 @@
         </div>
       </div>
     </section>
+
+    <footer class="creator">
+      Instagram：
+      <a href="https://www.instagram.com/sam89911268/" target="_blank" rel="noopener noreferrer">@sam89911268</a>
+    </footer>
   </main>
 
   <script src="biology-plant-questions.js"></script>
